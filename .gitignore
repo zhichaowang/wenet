@@ -36,6 +36,7 @@ data
 raw_wav
 tensorboard
 **/*build*
+extracted
 
 # linux dir files
 examples/*/s*/data
