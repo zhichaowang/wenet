@@ -38,9 +38,8 @@ tensorboard
 **/*build*
 
 # linux dir files
-/examples/*/s*/data
-/examples/*/s*/exp
-/examples/*/s*/extracted
-/examples/*/s*/raw_wav
-/examples/*/s*/tensorboard
-extracted
+examples/*/s*/data
+examples/*/s*/exp
+examples/*/s*/extracted
+examples/*/s*/raw_wav
+examples/*/s*/tensorboard
