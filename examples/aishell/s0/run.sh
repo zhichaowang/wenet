@@ -11,8 +11,8 @@ export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 # https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html
 # export NCCL_SOCKET_IFNAME=ens4f1
 export NCCL_DEBUG=INFO
-stage=0 # start from 0 if you need to start from data preparation
-stop_stage=6
+stage=4 # start from 0 if you need to start from data preparation
+stop_stage=4
 # The num of nodes or machines used for multi-machine training
 # Default 1 for single machine/node
 # NFS will be needed if you want run multi-machine training
@@ -22,11 +22,11 @@ num_nodes=1
 # the third one set node_rank 2, and so on. Default 0
 node_rank=0
 # data
-data=/export/data/asr-data/OpenSLR/33/
+data=/nfsdata/database/aishell
 data_url=www.openslr.org/resources/33
 
 nj=16
-feat_dir=raw_wav
+feat_dir=extracted
 dict=data/dict/lang_char.txt
 
 train_set=train
@@ -38,7 +38,7 @@ train_set=train
 # 5. conf/train_conformer_no_pos.yaml: Conformer without relative positional encoding
 # 6. conf/train_u2++_conformer.yaml: U2++ conformer
 # 7. conf/train_u2++_transformer.yaml: U2++ transformer
-train_config=conf/train_conformer.yaml
+train_config=conf/train_u2++_conformer_sogou.yaml
 cmvn=true
 dir=exp/conformer
 checkpoint=
@@ -46,7 +46,7 @@ checkpoint=
 # use average_checkpoint will get better result
 average_checkpoint=true
 decode_checkpoint=$dir/final.pt
-average_num=30
+average_num=10
 decode_modes="ctc_greedy_search ctc_prefix_beam_search attention attention_rescoring"
 
 . tools/parse_options.sh || exit 1;
@@ -101,16 +101,16 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     echo "Prepare data, prepare requried format"
     for x in dev test ${train_set}; do
         tools/format_data.sh --nj ${nj} \
-            --feat-type wav --feat $feat_dir/$x/wav.scp \
+            --feat-type kaldi --feat $feat_dir/$x/feats.scp \
             $feat_dir/$x ${dict} > $feat_dir/$x/format.data.tmp
 
-        tools/remove_longshortdata.py \
-            --min_input_len 0.5 \
-            --max_input_len 20 \
-            --max_output_len 400 \
-            --max_output_input_ratio 10.0 \
-            --data_file $feat_dir/$x/format.data.tmp \
-            --output_data_file $feat_dir/$x/format.data
+#        tools/remove_longshortdata.py \
+#            --min_input_len 0.5 \
+#            --max_input_len 20 \
+#            --max_output_len 400 \
+#            --max_output_input_ratio 10.0 \
+#            --data_file $feat_dir/$x/format.data.tmp \
+#            --output_data_file $feat_dir/$x/format.data
     done
 fi
 
